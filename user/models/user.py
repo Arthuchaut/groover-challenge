@@ -1,3 +1,5 @@
+from datetime import datetime, tzinfo
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from user.managers import CustomUserManager
@@ -42,6 +44,31 @@ class User(AbstractUser):
 
     # The custom User manager
     objects: CustomUserManager = CustomUserManager()
+
+    @property
+    def token_expired(self) -> bool:
+        '''Check if the access_token is expired.
+
+        Returns:
+            bool: True if expired, False otherwise.
+        '''
+
+        # Compute the difference between
+        # the current datetime and the refreshed_date in seconds.
+        delta: float = (timezone.now() - self.refreshed_date).total_seconds()
+
+        return delta >= self.expires_in
+
+    @property
+    def scope_as_list(self) -> list[str]:
+        '''
+        Get the scope as a list of strings.
+        '''
+
+        if ' ' in self.scope:
+            return self.scope.split()
+
+        return [self.scope]
 
     class Meta:
         '''The User meta class definition.

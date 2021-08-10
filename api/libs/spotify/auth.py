@@ -1,7 +1,8 @@
 import base64
-from typing import Union
 import requests
+from typing import Union
 from django.utils.encoding import filepath_to_uri
+from user.models import User
 
 
 class Credentials:
@@ -85,7 +86,11 @@ class Token:
         self.token_type: str = token_type
         self.expires_in: int = expires_in
         self.refresh_token: str = refresh_token
-        self.scope: list[str] = scope.split()
+
+        if ' ' in scope:
+            self.scope: list[str] = scope.split()
+        else:
+            self.scope: list[str] = [scope]
 
     @property
     def bearer(self) -> str:
@@ -180,6 +185,51 @@ class Auth:
             + '?'
             + '&'.join(f'{k}={v}' for k, v in params.items())
         )
+
+    def update_token(self, refresh_token: str) -> Token:
+        '''
+        Updates the token.
+        A refresh token is required to get a new access token.
+
+        Args:
+            refresh_token (str): The refresh token.
+
+        Returns:
+            Token: The new token object.
+        '''
+
+        if not self.token:
+            raise TokenRequestError(
+                'An initial token is required before request a refreshed one.'
+            )
+
+        headers: dict[str, str] = {
+            'Authorization': self.creds.basic,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+        body: dict[str, str] = {
+            'grant_type': 'refresh_token',
+            'redirect_uri': self._redirect_uri,
+            'refresh_token': self.token.refresh_token,
+        }
+        response: requests.Response = requests.post(
+            self._TOKEN_URL,
+            headers=headers,
+            data=body,
+        )
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            raise TokenRequestError(e)
+
+        json_response: dict[str, str] = response.json()
+        self.token.access_token = json_response['access_token']
+        self.token.token_type = json_response['token_type']
+        self.token.expires_in = json_response['expires_in']
+        self.token.scope = json_response['scope'].split()
+
+        return self.token
 
     def get_token(self, code: str) -> Token:
         '''

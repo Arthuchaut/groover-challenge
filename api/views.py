@@ -27,4 +27,7 @@ class ArtistView(View):
         if not request.user.is_authenticated:
             return redirect('user:auth')
 
+        if request.user.token_expired:
+            return redirect('user:auth_refresh_token')
+
         return HttpResponse('Artists view not implemented yet.')
