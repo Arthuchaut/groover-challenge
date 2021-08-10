@@ -17,7 +17,7 @@ class Genre(models.Model):
     name: models.CharField = models.CharField(max_length=150)
 
     class Meta:
-        app_label: str = 'genre'
+        app_label: str = 'api'
         db_table: str = 'genre'
         verbose_name: str = _('genre')
         verbose_name_plural: str = _('genres')
