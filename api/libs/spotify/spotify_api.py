@@ -31,6 +31,9 @@ class SpotifyAPI:
         '''
         Get new releases from the Spotify Web API.
 
+        Raises:
+            SpotifyAPIError: If the request fails.
+
         Returns:
             dict[str, Any]: The new releases.
         '''
@@ -38,6 +41,16 @@ class SpotifyAPI:
         ...
 
     def get_me(self) -> dict[str, Any]:
+        '''
+        Get the current user's information.
+
+        Raises:
+            SpotifyAPIError: If the request fails.
+
+        Returns:
+            dict[str, Any]: The user's information.
+        '''
+
         self._raise_for_empty_token()
 
         headers: dict[str, str] = {
@@ -57,6 +70,13 @@ class SpotifyAPI:
         return response.json()
 
     def _raise_for_empty_token(self) -> None:
+        '''
+        Raises an error if the token is empty.
+
+        Raises:
+            SpotifyAPIError: If the token is empty.
+        '''
+
         if not self._auth.token:
             raise SpotifyAPIError('No token available.')
 

@@ -27,6 +27,9 @@ class CustomUserManager(BaseUserManager):
             refresh_token (str): The refresh token of the user.
             expires_in (int): The expiration time of the user.
 
+        Raises:
+            ValueError: If a required arg is not provided.
+
         Returns:
             User: The user model.
         '''

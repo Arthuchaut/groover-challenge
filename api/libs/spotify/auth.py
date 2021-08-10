@@ -194,6 +194,10 @@ class Auth:
         Args:
             refresh_token (str): The refresh token.
 
+        Raises:
+            TokenRequestError: If the token does not exists
+                or if an HTTPError occurs.
+
         Returns:
             Token: The new token object.
         '''
@@ -237,6 +241,9 @@ class Auth:
 
         Args:
             code (str): The authorization code.
+
+        Raises:
+            TokenRequestError: If an HTTPError occurs.
 
         Returns:
             dict[str, str]: The access token.
