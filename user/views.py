@@ -1,9 +1,16 @@
-from django.http.response import HttpResponseBadRequest
+from api.libs.spotify.spotify_api import SpotifyAPIError
+from django.http.response import (
+    HttpResponseBadRequest,
+    HttpResponseServerError,
+)
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import redirect
 from django.views.generic import View
 from django.http import HttpRequest, HttpResponse
+from django.contrib.auth import login
+from user.models import User
 from api.libs.spotify.spotify_manager import SpotifyManager
+from api.libs.spotify.auth import TokenRequestError
 from django.conf import settings
 
 
@@ -36,7 +43,7 @@ class AuthView(View):
             return redirect(sp_man.auth.authorize_url)
 
         return HttpResponseBadRequest(
-            _(f'User already authenticated with {request.user.mail}.')
+            _(f'User already authenticated with {request.user.email}.')
         )
 
 
@@ -59,8 +66,32 @@ class AuthCallbackView(View):
             HttpResponse: An HTTP response.
         '''
 
+        sp_man: SpotifyManager = SpotifyManager(
+            client_id=settings.APP_CONFIG.SPOTIFY_API_CLIENT_ID,
+            client_secret=settings.APP_CONFIG.SPOTIFY_API_CLIENT_SECRET,
+            scope=settings.APP_CONFIG.SPOTIFY_API_SCOPE,
+            redirect_uri=settings.APP_CONFIG.SPOTIFY_API_REDIRECT_URI,
+        )
         code: str = request.GET.get('code')
 
-        # TODO: User creation/updating process.
+        if not code:
+            return HttpResponseBadRequest(_('Missing code.'))
 
-        return HttpResponse('Redirection not implemented yet.')
+        try:
+            token: dict[str, str] = sp_man.auth.get_token(code)
+            me_info: dict[str, str] = sp_man.api.get_me()
+        except (TokenRequestError, SpotifyAPIError) as e:
+            print(e)
+            return HttpResponseServerError(e)
+
+        user: User = User.objects.create_or_update_user(
+            email=me_info['email'],
+            access_token=token.access_token,
+            token_type=token.token_type,
+            refresh_token=token.refresh_token,
+            expires_in=token.expires_in,
+            scope=token.scope_as_str,
+        )
+        login(request, user)
+
+        return redirect('api:artists')

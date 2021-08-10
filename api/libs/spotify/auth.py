@@ -1,6 +1,6 @@
-import os
 import base64
 from typing import Union
+import requests
 from django.utils.encoding import filepath_to_uri
 
 
@@ -26,7 +26,7 @@ class Credentials:
         self._client_secret: str = client_secret
 
     @property
-    def _b64_creds(self) -> str:
+    def _b64creds(self) -> str:
         '''
         Returns the base64 encoded credentials.
 
@@ -39,6 +39,55 @@ class Credentials:
         ).decode('utf-8')
 
     @property
+    def basic(self) -> str:
+        '''
+        Returns the basic authentication string.
+
+        Returns:
+            str: The basic authentication string.
+        '''
+
+        return f'Basic {self._b64creds}'
+
+
+class Token:
+    '''
+    The token class.
+
+    Attributes:
+        access_token (str): The access token.
+        token_type (str): The token type.
+        expires_in (int): The token ttl.
+        refresh_token (str): The refresh token.
+        scope (list[str]): The scope.
+    '''
+
+    def __init__(
+        self,
+        access_token: str,
+        token_type: str,
+        expires_in: int,
+        refresh_token: str,
+        scope: str,
+    ) -> None:
+        '''
+        The constructor.
+
+        Args:
+            access_token (str): The access token.
+            token_type (str): The token type.
+            expires_in (int): The token ttl.
+            refresh_token (str): The refresh token.
+            scope (str): The scope.
+        '''
+
+        self.access_token: str = access_token
+        self.token_type: str = token_type
+        self.expires_in: int = expires_in
+        self.refresh_token: str = refresh_token
+        self.scope: list[str] = scope.split()
+
+    @property
     def bearer(self) -> str:
         '''
         Returns the bearer token.
@@ -47,7 +96,18 @@ class Credentials:
             str: The bearer token.
         '''
 
-        return f'Bearer {self._b64_creds}'
+        return f'Bearer {self.access_token}'
+
+    @property
+    def scope_as_str(self) -> str:
+        '''
+        Returns the scope as a string.
+
+        Returns:
+            str: The scope.
+        '''
+
+        return ' '.join(self.scope)
 
 
 class Auth:
@@ -58,7 +118,7 @@ class Auth:
     Attributes:
         _AUTHORIZE_URL (str): The Spotify authorize url.
         _TOKEN_URL (str): The Spotify token url.
-        _creds (Credentials): The credentials.
+        creds (Credentials): The credentials.
         _scope (list[str]): The scope.
         _redirect_uri (str): The redirect uri.
     '''
@@ -78,9 +138,10 @@ class Auth:
             redirect_uri (str): The redirect uri.
         '''
 
-        self._creds: Credentials = creds
+        self.creds: Credentials = creds
         self._scope: list[str] = scope
         self._redirect_uri: str = redirect_uri
+        self.token: Token = None
 
     def _url_encode(self, obj: Union[list[str], str]) -> str:
         '''
@@ -109,7 +170,7 @@ class Auth:
 
         params: dict[str, str] = {
             'response_type': 'code',
-            'client_id': self._creds.client_id,
+            'client_id': self.creds.client_id,
             'scope': self._url_encode(self._scope),
             'redirect_uri': self._url_encode(self._redirect_uri),
         }
@@ -119,3 +180,49 @@ class Auth:
             + '?'
             + '&'.join(f'{k}={v}' for k, v in params.items())
         )
+
+    def get_token(self, code: str) -> Token:
+        '''
+        Get access_token from the Spotify Auth Server.
+
+        Args:
+            code (str): The authorization code.
+
+        Returns:
+            dict[str, str]: The access token.
+        '''
+
+        headers: dict[str, str] = {
+            'Authorization': self.creds.basic,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+        body: dict[str, str] = {
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': self._redirect_uri,
+        }
+        response: requests.Response = requests.post(
+            self._TOKEN_URL,
+            headers=headers,
+            data=body,
+        )
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            raise TokenRequestError(e)
+
+        json_response: dict[str, str] = response.json()
+        self.token = Token(
+            json_response['access_token'],
+            json_response['token_type'],
+            json_response['expires_in'],
+            json_response['refresh_token'],
+            json_response['scope'],
+        )
+
+        return self.token
+
+
+class TokenRequestError(Exception):
+    ...

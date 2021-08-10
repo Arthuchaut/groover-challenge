@@ -6,14 +6,14 @@ class CustomUserManager(BaseUserManager):
     The custom User manager class.
     '''
 
-    def create_user(
+    def create_or_update_user(
         self,
         email: str,
         access_token: str,
         token_type: str,
         scope: str,
-        refresh_token: str,
         expires_in: int,
+        refresh_token: str = None,
     ) -> object:
         '''
         Creates and saves a User with the given email, access_token,
@@ -34,14 +34,27 @@ class CustomUserManager(BaseUserManager):
             if not val:
                 raise ValueError(f'Missing {attr} parameter.')
 
-        user: self.model = self.model(
-            email=self.normalize_email(email),
-            access_token=access_token,
-            token_type=token_type,
-            scope=scope,
-            refresh_token=refresh_token,
-            expires_in=expires_in,
-        )
+        try:
+            user: self.model = self.model.objects.get(
+                email=self.normalize_email(email)
+            )
+            user.access_token = access_token
+            user.token_type = token_type
+            user.scope = scope
+            user.expires_in = expires_in
+
+            if refresh_token:
+                user.refresh_token = refresh_token
+        except self.model.DoesNotExist:
+            user = self.model(
+                email=self.normalize_email(email),
+                access_token=access_token,
+                token_type=token_type,
+                scope=scope,
+                refresh_token=refresh_token,
+                expires_in=expires_in,
+            )
+
         user.save(using=self._db)
 
         return user
