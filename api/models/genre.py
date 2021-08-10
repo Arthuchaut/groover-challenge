@@ -6,7 +6,7 @@ class Genre(models.Model):
     '''
     Genre model
 
-    Args:
+    Attributes:
         genre_id (models.BigAutoField): The Genre ID.
         name (models.CharField): The Genre name.
     '''

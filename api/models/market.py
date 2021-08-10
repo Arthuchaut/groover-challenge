@@ -3,6 +3,14 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Market(models.Model):
+    '''
+    The market model.
+
+    Attributes:
+        market_id (models.BigAutoField): The market id.
+        country_code (models.CharField): The country code.
+    '''
+
     market_id: models.BigAutoField = models.BigAutoField(
         auto_created=True, primary_key=True, serialize=False
     )

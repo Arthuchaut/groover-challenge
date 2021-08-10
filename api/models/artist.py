@@ -7,7 +7,7 @@ class Artist(models.Model):
     '''
     Artist model.
 
-    Args:
+    Attributes:
         artist_id (models.CharField): The Artist ID.
         name (models.CharField): The Artist Name.
         followers (models.IntegerField): The number of followers.
