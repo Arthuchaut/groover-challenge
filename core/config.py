@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -19,7 +19,9 @@ class Config:
     '''
 
     SPOTIFY_API_REDIRECT_URI: str = os.environ['SPOTIFY_API_REDIRECT_URI']
-    SPOTIFY_API_SCOPE: list[str] = os.environ['SPOTIFY_API_SCOPE'].split()
+    SPOTIFY_API_SCOPE: list[str] = field(
+        default_factory=os.environ['SPOTIFY_API_SCOPE'].split
+    )
     SPOTIFY_API_CLIENT_ID: str = os.environ['SPOTIFY_API_CLIENT_ID']
     SPOTIFY_API_CLIENT_SECRET: str = os.environ['SPOTIFY_API_CLIENT_SECRET']
     POSTGRES_HOST: str = os.environ['POSTGRES_HOST']
