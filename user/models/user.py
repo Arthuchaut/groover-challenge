@@ -65,10 +65,7 @@ class User(AbstractUser):
         Get the scope as a list of strings.
         '''
 
-        if ' ' in self.scope:
-            return self.scope.split()
-
-        return [self.scope]
+        return self.scope.split()
 
     class Meta:
         '''The User meta class definition.

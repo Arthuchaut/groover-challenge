@@ -86,11 +86,7 @@ class Token:
         self.token_type: str = token_type
         self.expires_in: int = expires_in
         self.refresh_token: str = refresh_token
-
-        if ' ' in scope:
-            self.scope: list[str] = scope.split()
-        else:
-            self.scope: list[str] = [scope]
+        self.scope: list[str] = scope.split()
 
     @property
     def bearer(self) -> str:
@@ -112,7 +108,10 @@ class Token:
             str: The scope.
         '''
 
-        return ' '.join(self.scope)
+        if isinstance(self.scope, list):
+            return ' '.join(self.scope)
+
+        return self.scope
 
 
 class Auth:
