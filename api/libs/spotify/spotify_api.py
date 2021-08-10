@@ -14,10 +14,27 @@ class SpotifyAPI:
     def __init__(self, auth: Auth) -> None:
         self._auth: Auth = auth
 
-    def get_artist(id_: str) -> dict[str, Any]:
+    def get_artist(self, id_: str) -> dict[str, Any]:
+        '''
+        Get artist information.
+
+        Args:
+            id_ (str): The Spotify ID of the artist.
+
+        Returns:
+            dict[str, Any]: The artist information.
+        '''
+
         ...
 
-    def get_new_releases() -> dict[str, Any]:
+    def get_new_releases(self) -> dict[str, Any]:
+        '''
+        Get new releases from the Spotify Web API.
+
+        Returns:
+            dict[str, Any]: The new releases.
+        '''
+
         ...
 
     def get_me(self) -> dict[str, Any]:
