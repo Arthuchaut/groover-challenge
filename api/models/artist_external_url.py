@@ -17,9 +17,11 @@ class ArtistExternalURL(models.Model):
     external_url_id: models.BigAutoField = models.BigAutoField(
         auto_created=True, primary_key=True, serialize=False
     )
-    source: models.CharField(max_length=150)
-    url: models.URLField()
-    artist: models.ForeignKey(Artist, on_delete=models.CASCADE)
+    source: models.CharField = models.CharField(max_length=150)
+    url: models.URLField = models.URLField()
+    artist: models.ForeignKey = models.ForeignKey(
+        Artist, on_delete=models.CASCADE
+    )
 
     class Meta:
         app_label: str = 'api'
