@@ -24,8 +24,9 @@ class CustomUserManager(BaseUserManager):
             access_token (str): The access token of the user.
             token_type (str): The token type of the user.
             scope (str): The scope of the user.
-            refresh_token (str): The refresh token of the user.
             expires_in (int): The expiration time of the user.
+            refresh_token (str): The refresh token of the user.
+                Default to None.
 
         Raises:
             ValueError: If a required arg is not provided.
@@ -33,8 +34,11 @@ class CustomUserManager(BaseUserManager):
         Returns:
             User: The user model.
         '''
+
+        ignored_params: list[str] = ['refresh_token']
+
         for attr, val in locals().items():
-            if not val:
+            if not attr in ignored_params and not val:
                 raise ValueError(f'Missing {attr} parameter.')
 
         try:

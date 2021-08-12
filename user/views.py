@@ -72,7 +72,7 @@ class AuthRefreshTokenView(View):
             scope=settings.APP_CONFIG.SPOTIFY_API_SCOPE,
             redirect_uri=settings.APP_CONFIG.SPOTIFY_API_REDIRECT_URI,
         )
-        sp_man.init_token(request.user)
+        sp_man.recover_token(request.user)
 
         try:
             sp_man.auth.update_token(request.user.refresh_token)
@@ -123,19 +123,18 @@ class AuthCallbackView(View):
             return HttpResponseBadRequest(_('Missing code.'))
 
         try:
-            token: dict[str, str] = sp_man.auth.get_token(code)
+            token_info: dict[str, str] = sp_man.auth.get_token(code)
             me_info: dict[str, str] = sp_man.api.get_me()
         except (TokenRequestError, SpotifyAPIError) as e:
-            print(e)
             return HttpResponseServerError(e)
 
         user: User = User.objects.create_or_update_user(
             email=me_info['email'],
-            access_token=token.access_token,
-            token_type=token.token_type,
-            refresh_token=token.refresh_token,
-            expires_in=token.expires_in,
-            scope=token.scope_as_str,
+            access_token=token_info.access_token,
+            token_type=token_info.token_type,
+            refresh_token=token_info.refresh_token,
+            expires_in=token_info.expires_in,
+            scope=token_info.scope_as_str,
         )
         login(request, user)
 

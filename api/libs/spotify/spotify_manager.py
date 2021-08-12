@@ -36,7 +36,7 @@ class SpotifyManager:
         )
         self.api: SpotifyAPI = SpotifyAPI(self.auth)
 
-    def init_token(self, user: User) -> None:
+    def recover_token(self, user: User) -> None:
         '''
         Initialize the token from the user.
 
