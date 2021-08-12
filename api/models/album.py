@@ -32,8 +32,7 @@ class Album(models.Model):
     release_date: models.DateField = models.DateField()
     last_checked_date: models.DateField = models.DateField()
     release_date_precision: models.CharField = models.CharField(max_length=10)
-    total_tracks: models.IntegerField = models.IntegerField()
-    other_album_type: models.CharField = models.CharField(max_length=50)
+    object_type: models.CharField = models.CharField(max_length=50)
     uri: models.URLField = models.URLField()
     available_markets: models.ManyToManyField = models.ManyToManyField(
         Market, related_name='album', blank=True, db_table='available_markets'
