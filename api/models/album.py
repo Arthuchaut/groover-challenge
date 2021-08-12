@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from . import Market
+from . import Market, Artist
 
 
 class Album(models.Model):
@@ -21,7 +21,7 @@ class Album(models.Model):
         available_markets (models.ManyToManyField): The available markets.
     '''
 
-    artist_id: models.CharField = models.CharField(
+    album_id: models.CharField = models.CharField(
         primary_key=True,
         max_length=22,
         unique=True,
@@ -37,6 +37,9 @@ class Album(models.Model):
     uri: models.URLField = models.URLField()
     available_markets: models.ManyToManyField = models.ManyToManyField(
         Market, related_name='album', blank=True, db_table='available_markets'
+    )
+    artists: models.ManyToManyField = models.ManyToManyField(
+        Artist, related_name='album', blank=True, db_table='artists'
     )
 
     class Meta:
