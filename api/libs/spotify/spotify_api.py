@@ -14,6 +14,38 @@ class SpotifyAPI:
     def __init__(self, auth: Auth) -> None:
         self._auth: Auth = auth
 
+    def _get(
+        self, resource: str, params: dict[str, Any] = None
+    ) -> dict[str, Any]:
+        '''
+        Get information from the Spotify Web API.
+
+        Args:
+            url (str): The Spotify Web API URL.
+
+        Raises:
+            SpotifyAPIError: If the request fails.
+
+        Returns:
+            dict[str, Any]: The response.
+        '''
+
+        self._raise_for_empty_token()
+        headers: dict[str, str] = {
+            'Authorization': self._auth.token.bearer,
+            'Accept': 'application/json',
+        }
+        response: requests.Response = requests.get(
+            self._SPOTIFY_API_URL + resource, headers=headers, params=params
+        )
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as e:
+            raise SpotifyAPIError(e)
+
+        return response.json()
+
     def get_artist(self, id_: str) -> dict[str, Any]:
         '''
         Get artist information.
@@ -25,7 +57,7 @@ class SpotifyAPI:
             dict[str, Any]: The artist information.
         '''
 
-        ...
+        return self._get(resource=f'artists/{id_}')
 
     def get_new_releases(self) -> dict[str, Any]:
         '''
@@ -38,7 +70,7 @@ class SpotifyAPI:
             dict[str, Any]: The new releases.
         '''
 
-        ...
+        return self._get(resource='browse/new-releases')
 
     def get_me(self) -> dict[str, Any]:
         '''
@@ -51,23 +83,7 @@ class SpotifyAPI:
             dict[str, Any]: The user's information.
         '''
 
-        self._raise_for_empty_token()
-
-        headers: dict[str, str] = {
-            'Authorization': self._auth.token.bearer,
-            'Accept': 'application/json',
-        }
-        response: requests.Response = requests.get(
-            f'{self._SPOTIFY_API_URL}me',
-            headers=headers,
-        )
-
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as e:
-            raise SpotifyAPIError(e)
-
-        return response.json()
+        return self._get(resource='me')
 
     def _raise_for_empty_token(self) -> None:
         '''
