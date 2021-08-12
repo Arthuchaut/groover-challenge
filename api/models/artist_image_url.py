@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from . import Artist
@@ -24,6 +25,22 @@ class ArtistImageURL(models.Model):
     artist: models.ForeignKey = models.ForeignKey(
         Artist, on_delete=models.CASCADE
     )
+
+    @property
+    def as_dict(self) -> dict[str, Any]:
+        '''
+        A dictionary representation of the model.
+
+        Returns:
+            dict[str, Any]: The dict representation.
+        '''
+
+        return {
+            'id': self.image_url_id,
+            'width': self.width,
+            'height': self.height,
+            'url': self.url,
+        }
 
     class Meta:
         app_label: str = 'api'

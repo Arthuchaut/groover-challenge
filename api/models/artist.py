@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from . import Genre
@@ -30,6 +31,26 @@ class Artist(models.Model):
     artist_type: models.CharField = models.CharField(max_length=255)
     uri: models.URLField = models.URLField()
     genres: models.ManyToManyField = models.ManyToManyField(Genre)
+
+    @property
+    def as_dict(self) -> dict[str, Any]:
+        """
+        Format the Artist object in dict object.
+
+        Returns:
+            dict[str, Any]: The formatted Artist object.
+        """
+
+        return {
+            'artist_id': self.artist_id,
+            'name': self.name,
+            'followers': self.followers,
+            'popularity': self.popularity,
+            'href': self.href,
+            'artist_type': self.artist_type,
+            'uri': self.uri,
+            'genres': [genre.name for genre in self.genres.all()],
+        }
 
     class Meta:
         app_label: str = 'api'
