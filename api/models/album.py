@@ -39,7 +39,7 @@ class Album(models.Model):
         Market, related_name='album', blank=True, db_table='available_markets'
     )
     artists: models.ManyToManyField = models.ManyToManyField(
-        Artist, related_name='album', blank=True, db_table='artists'
+        Artist, related_name='album', blank=True, db_table='artists_albums'
     )
 
     class Meta:
