@@ -79,7 +79,7 @@ class AuthRefreshTokenView(View):
         except TokenRequestError as e:
             return HttpResponseBadRequest(e)
 
-        user: User = User.objects.create_or_update_user(
+        User.objects.create_or_update_user(
             email=request.user.email,
             access_token=sp_man.auth.token.access_token,
             token_type=sp_man.auth.token.token_type,
@@ -87,7 +87,6 @@ class AuthRefreshTokenView(View):
             scope=sp_man.auth.token.scope_as_str,
             expires_in=sp_man.auth.token.expires_in,
         )
-        user.save()
 
         return redirect('api:artists')
 
