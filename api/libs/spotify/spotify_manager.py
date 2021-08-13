@@ -102,15 +102,21 @@ class SpotifyManager:
 
         for artist_info in artists_info:
             genre_set: set[Genre] = set()
-            artist_model, _ = Artist.objects.get_or_create(
-                artist_id=artist_info['id'],
-                name=artist_info['name'],
-                followers=artist_info['followers']['total'],
-                popularity=artist_info['popularity'],
-                artist_type=artist_info['type'],
-                uri=artist_info['uri'],
-                href=artist_info['href'],
-            )
+
+            try:
+                artist_model: Artist = Artist.objects.get(
+                    artist_id=artist_info['id']
+                )
+            except Artist.DoesNotExist:
+                artist_model: Artist = Artist.objects.create(
+                    artist_id=artist_info['id'],
+                    name=artist_info['name'],
+                    followers=artist_info['followers']['total'],
+                    popularity=artist_info['popularity'],
+                    artist_type=artist_info['type'],
+                    uri=artist_info['uri'],
+                    href=artist_info['href'],
+                )
 
             for genre in artist_info['genres']:
                 genre_model, _ = Genre.objects.get_or_create(name=genre)
@@ -155,7 +161,7 @@ class SpotifyManager:
             album_model.last_checked_date = timezone.now()
             album_model.save()
         except Album.DoesNotExist:
-            album_model, _ = Album.objects.create(
+            album_model: Album = Album.objects.create(
                 album_id=album_info['id'],
                 album_type=album_info['album_type'],
                 name=album_info['name'],
