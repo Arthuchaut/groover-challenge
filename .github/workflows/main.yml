@@ -30,6 +30,7 @@ jobs:
 
       - name: Init environment
         run: |
+          cp .env-example .env
           poetry install
           poetry run python manage.py migrate
         
