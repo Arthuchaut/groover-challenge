@@ -64,17 +64,25 @@ class SpotifyManager:
             scope=user.scope,
         )
 
-    def get_new_releases_from_db(self) -> list[Album]:
+    def get_today_new_releases(self) -> list[Album]:
         '''
         Get the new releases from the database.
         Filter the query by the current date.
+        If no data is found, update DB from Spotify API
+        and return the new releases.
 
         Returns:
             list[Album]: The list of new releases.
-                None if there is no data.
         '''
 
-        return Album.objects.filter(last_checked_date=timezone.now())
+        today_releases: list[Album] = Album.objects.filter(
+            last_checked_date=timezone.now()
+        )
+
+        if not today_releases:
+            today_releases = self.update_new_releases_in_db()
+
+        return today_releases
 
     def _update_artists_in_db(self, artist_ids: list[str]) -> set[Artist]:
         '''
@@ -185,12 +193,13 @@ class SpotifyManager:
 
         return album_model
 
-    def update_new_releases_in_db(self) -> None:
+    def update_new_releases_in_db(self) -> list[Album]:
         '''
         Update the new releases in the database.
         '''
 
         new_releases: Iterator[dict[str, Any]] = self.api.get_new_releases()
+        albums: list[Album] = []
 
         for album_info in new_releases:
             artist_ids: list[str] = [
@@ -199,3 +208,6 @@ class SpotifyManager:
             artist_set: set[Artist] = self._update_artists_in_db(artist_ids)
             album_model: Album = self._update_album_in_db(album_info)
             album_model.artists.add(*artist_set)
+            albums.append(album_model)
+
+        return albums

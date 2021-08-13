@@ -41,14 +41,10 @@ class ArtistView(View):
             redirect_uri=settings.APP_CONFIG.SPOTIFY_API_REDIRECT_URI,
         )
         sp_man.recover_token(request.user)
-        new_releases: list[Album] = sp_man.get_new_releases_from_db()
+        today_releases: list[Album] = sp_man.get_today_new_releases()
         artists: list[dict[str, Any]] = []
 
-        if not new_releases:
-            sp_man.update_new_releases_in_db()
-            new_releases = sp_man.get_new_releases_from_db()
-
-        for album in new_releases:
+        for album in today_releases:
             for artist in album.artists.all():
                 external_urls: list[
                     ArtistExternalURL
