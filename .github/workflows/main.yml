@@ -27,7 +27,7 @@ jobs:
 
       - name: Init environment
         run: |
-          poetry install --dev
+          poetry install
           poetry run python manage.py migrate
         
       - name: Run tests
