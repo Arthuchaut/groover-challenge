@@ -26,7 +26,7 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
 
       - name: Init environment
-        run: /
+        run: |
           poetry install --dev
           poetry run python manage.py migrate
         
