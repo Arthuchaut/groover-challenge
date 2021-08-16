@@ -50,7 +50,7 @@ Just run the following command (at the root of the project):
 
 #### With Pip
 
-Create the virtual environment (same rule for the `python` command):
+Create the virtual environment (please replace `python` by the correct alias for the Python 3.9 executable):
 
     python -m venv venv
 
@@ -64,7 +64,7 @@ Activate the virtual environment.
 
     source venv/bin/activate
 
-Run the following command (please replace `python` by the correct alias for the Python 3.9 executable):
+Run the following command (same rule for the `python` command):
 
     python -m pip install -r requirements.txt -r requirements-dev.txt
 
