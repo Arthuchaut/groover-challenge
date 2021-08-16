@@ -13,10 +13,10 @@
     - [Tests](#tests)
       - [With Poetry](#with-poetry-1)
       - [With Pip](#with-pip-1)
-  - [Run server](#run-server)
-    - [With Poetry](#with-poetry-2)
-    - [With Pip](#with-pip-2)
-  - [Test the app](#test-the-app)
+    - [Run server](#run-server)
+      - [With Poetry](#with-poetry-2)
+      - [With Pip](#with-pip-2)
+    - [Test the app](#test-the-app)
   - [Routing](#routing)
 
 ## Requirements
@@ -80,21 +80,21 @@ Ensure to have the venv activated, then run the following command:
 
     pytest
 
-## Run server
+### Run server
 
 Run the followind command:
 
-### With Poetry
+#### With Poetry
 
     poetry run python manage.py runserver 8000
 
-### With Pip
+#### With Pip
 
 Ensure to have the virtual environment activated first.
 
     python manage.py runserver 8000
 
-## Test the app
+### Test the app
 
 Open a lambda browser (except IE, we're not animals) and then enter the following URL: `localhost:8000/api/artists/`.
 
