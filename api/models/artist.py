@@ -52,6 +52,9 @@ class Artist(models.Model):
             'genres': [genre.name for genre in self.genres.all()],
         }
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'artist'

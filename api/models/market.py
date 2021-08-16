@@ -16,6 +16,9 @@ class Market(models.Model):
     )
     country_code: models.CharField = models.CharField(max_length=2)
 
+    def __str__(self) -> str:
+        return self.country_code
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'market'

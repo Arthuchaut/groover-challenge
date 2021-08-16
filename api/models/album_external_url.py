@@ -23,6 +23,9 @@ class AlbumExternalURL(models.Model):
         Album, on_delete=models.CASCADE
     )
 
+    def __str__(self) -> str:
+        return self.url
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'album_external_url'

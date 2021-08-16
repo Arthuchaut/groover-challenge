@@ -16,6 +16,9 @@ class Genre(models.Model):
     )
     name: models.CharField = models.CharField(max_length=150)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'genre'

@@ -41,6 +41,9 @@ class Album(models.Model):
         Artist, related_name='album', blank=True, db_table='artists_albums'
     )
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'album'

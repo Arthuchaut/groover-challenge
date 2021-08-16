@@ -42,6 +42,9 @@ class ArtistImageURL(models.Model):
             'url': self.url,
         }
 
+    def __str__(self) -> str:
+        return self.url
+
     class Meta:
         app_label: str = 'api'
         db_table: str = 'artist_image_url'
